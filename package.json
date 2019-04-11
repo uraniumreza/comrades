@@ -1,0 +1,10 @@
+{
+  "name": "comrades",
+  "version": "0.0.1",
+  "description": "a tool to follow all the comrades from twitter",
+  "main": "index.js",
+  "repository": "https://github.com/uraniumreza/comrades",
+  "author": "Nayeem Reza <reza.uranium@gmail.com>",
+  "license": "None",
+  "private": false
+}
