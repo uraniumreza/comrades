@@ -12,6 +12,7 @@
     "lint": "node_modules/.bin/eslint ."
   },
   "dependencies": {
+    "chalk": "^2.4.2",
     "enquirer": "^2.3.0"
   },
   "devDependencies": {

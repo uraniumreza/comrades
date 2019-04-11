@@ -1,4 +1,5 @@
 const { Form } = require('enquirer');
+const log = require('./chalk');
 
 const validateEmail = (email) => {
   const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -38,8 +39,10 @@ const validateEmail = (email) => {
     ],
   });
 
-  prompt
+  await prompt
     .run()
-    .then(({ email, password }) => console.log(email, password))
-    .catch(console.error);
+    .then(({ email, password }) => {
+      log.blue(email, password);
+    })
+    .catch(log.red);
 })();
