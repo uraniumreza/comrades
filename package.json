@@ -6,5 +6,16 @@
   "repository": "https://github.com/uraniumreza/comrades",
   "author": "Nayeem Reza <reza.uranium@gmail.com>",
   "license": "None",
-  "private": false
+  "private": false,
+  "scripts": {
+    "start": "node src",
+    "lint": "node_modules/.bin/eslint ."
+  },
+  "dependencies": {
+    "enquirer": "^2.3.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb": "^17.1.0"
+  }
 }
