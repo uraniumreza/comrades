@@ -42,7 +42,16 @@ const validateEmail = (email) => {
   await prompt
     .run()
     .then(({ email, password }) => {
-      log.blue(email, password);
+      if (!validateEmail(email)) {
+        log.red('Dude, please enter a valid email address!');
+        process.exit(0);
+      } else if (password.length === 0) {
+        log.red(
+          'Dude, you forgot to give your password! Use arrow key to move to password field;',
+        );
+        process.exit(0);
+      }
+      log.yellow("Okay, now we're trying to sign in to your account!");
     })
     .catch(log.red);
 })();
