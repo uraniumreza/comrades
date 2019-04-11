@@ -1,5 +1,6 @@
-const { Form } = require('enquirer');
+const { Form, Input } = require('enquirer');
 const log = require('./chalk');
+const puppeteer = require('puppeteer');
 
 const validateEmail = (email) => {
   const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -7,6 +8,9 @@ const validateEmail = (email) => {
 };
 
 (async () => {
+  const browser = await puppeteer.launch({ headless: false });
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1400, height: 1050 });
   const prompt = new Form({
     name: 'user',
     message: 'Please provide your twitter credentials:',
@@ -41,7 +45,7 @@ const validateEmail = (email) => {
 
   await prompt
     .run()
-    .then(({ email, password }) => {
+    .then(async ({ email, password }) => {
       if (!validateEmail(email)) {
         log.red('Dude, please enter a valid email address!');
         process.exit(0);
@@ -51,7 +55,26 @@ const validateEmail = (email) => {
         );
         process.exit(0);
       }
-      log.yellow("Okay, now we're trying to sign in to your account!");
+      log.yellow("Okay, we're trying to sign in to your account!");
+      await page.goto('https://twitter.com/', { waitUntil: 'load' });
+      log.blue(
+        `Now we're at ${page.url()}, using your credentials to log in -`,
+      );
+
+      await page.type('.js-signin-email', email);
+      await page.type('.LoginForm-password > input', password);
+      await page.click('.js-submit');
+      await page.waitForSelector('.DashboardProfileCard-content').catch(() => {
+        log.red('Sorry, your credentials are wrong');
+        browser.close();
+        process.exit(0);
+      });
+
+      log.green('Successfully Logged In!');
+
+      await setTimeout(() => {
+        browser.close();
+      }, 30000);
     })
     .catch(log.red);
 })();
