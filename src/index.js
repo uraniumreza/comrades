@@ -72,6 +72,29 @@ const validateEmail = (email) => {
 
       log.green('Successfully Logged In!');
 
+      const prompt = new Input({
+        name: 'url',
+        message: 'What is the twitter handle of the comrade?',
+      });
+
+      prompt
+        .run()
+        .then(async (handle) => {
+          log.yellow(`Navigating to: https://twitter.com/${handle}/following`);
+          await page.goto(`https://twitter.com/${handle}/following`, {
+            waitUntil: 'load',
+          });
+
+          await page.waitForSelector('.ProfileAvatar').catch(() => {
+            log.red("Sorry, couldn't navigate to comrade's profile-page!");
+            browser.close();
+            process.exit(0);
+          });
+
+          log.green(`Now we're at ${handle} following page!`);
+        })
+        .catch(log.red);
+
       await setTimeout(() => {
         browser.close();
       }, 30000);
