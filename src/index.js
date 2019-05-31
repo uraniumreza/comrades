@@ -7,10 +7,31 @@ const validateEmail = (email) => {
   return re.test(String(email).toLowerCase());
 };
 
+async function followComrades(page, minNumberOfComrades = 50) {
+  log.red("LET's ROLL");
+  let buttons = [];
+  while (buttons.length < minNumberOfComrades) {
+    await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
+    buttons = await page.evaluate(() => {
+      return [
+        ...document.querySelectorAll(
+          '.Grid--withGutter .user-actions.btn-group.not-muting.not-following .EdgeButton.EdgeButton--secondary.EdgeButton--small.button-text.follow-text',
+        ),
+      ];
+    });
+  }
+  log.red(buttons.length);
+  for (let i = 0, len = buttons.length; i < len; i++) {
+    log.cyan('following', i);
+    buttons[i].click();
+    await page.waitFor(10000);
+  }
+}
+
 (async () => {
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
-  await page.setViewport({ width: 1400, height: 1050 });
+  await page.setViewport({ width: 1920, height: 1080 });
   const prompt = new Form({
     name: 'user',
     message: 'Please provide your twitter credentials:',
@@ -51,7 +72,7 @@ const validateEmail = (email) => {
         process.exit(0);
       } else if (password.length === 0) {
         log.red(
-          'Dude, you forgot to give your password! Use arrow key to move to password field;',
+          'Dude, you forgot to give your password! Use down arrow-key/tab to move to password field;',
         );
         process.exit(0);
       }
@@ -64,6 +85,7 @@ const validateEmail = (email) => {
       await page.type('.js-signin-email', email);
       await page.type('.LoginForm-password > input', password);
       await page.click('.js-submit');
+      // TODO: Make this error message bullet-proof
       await page.waitForSelector('.DashboardProfileCard-content').catch(() => {
         log.red('Sorry, your credentials are wrong');
         browser.close();
@@ -91,7 +113,9 @@ const validateEmail = (email) => {
             process.exit(0);
           });
 
-          log.green(`Now we're at ${handle} following page!`);
+          log.blue(`Now we're at ${handle} following page!`);
+
+          await followComrades(page);
         })
         .catch(log.red);
 
